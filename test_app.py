@@ -85,8 +85,16 @@ class TestWebApp(unittest.TestCase):
         # TODO: Can we store javascript tags in the username field?
         response = self.client.post('/signup', data = {
             'email' : 'user@test.com',
-            'name' : '<h1>Hello</h1>',
+            'name' : '<script>alert("Boo!")</script>',
             'password' : 'test123'
         }, follow_redirects = True)
         assert response.status_code == 200
+
+        response = self.client.post('/login', data = {
+            'email': 'user@test.com',
+            'password': 'test123'
+        }, follow_redirects = True)
+        assert response.status_code == 200
+        html = response.get_data(as_text = True)
+        assert not '<script>' in html
 
